@@ -5,6 +5,11 @@ function ca() {
 	cfssl gencert -initca=true ca-csr.json | cfssljson -bare ca/ca
 }
 
+function aggregator-ca() {
+	mkdir ca
+	cfssl gencert -initca=true aggregator-ca-csr.json | cfssljson -bare ca/aggregator-ca
+}
+
 function etcd() {
 	mkdir etcd
     cfssl gencert \
@@ -59,8 +64,8 @@ function apiserver-kubelet() {
 function proxy-client() {
 	mkdir kube-apiserver
 	cfssl gencert \
- 	   -ca ca/ca.pem \
- 	   -ca-key ca/ca-key.pem \
+ 	   -ca ca/aggregator-ca.pem \
+ 	   -ca-key ca/aggregator-ca-key.pem \
  	   -config config.json \
  	   -profile k8s proxy-client-csr.json | cfssljson -bare kube-apiserver/proxy-client
 }
@@ -93,41 +98,9 @@ function kube-proxy() {
 }
 
 case $1 in
-	"ca")
-		ca
-		;;
-	"sa")
-		sa
-		;;
-	"etcd")
-		etcd
-		;;
-	"flannel")
-		flannel
-		;;
-	"admin")
-		admin
-		;;
-	"kube-apiserver")
-		kube-apiserver
-		;;
-	"apiserver-kubelet")
-		apiserver-kubelet
-		;;
-	"proxy-client")
-		proxy-client
-		;;
-	"kube-controller-manager")
-		kube-controller-manager
-		;;
-	"kube-schedule")
-		kube-schedule
-		;;
-	"kube-proxy")
-		kube-proxy
-		;;
 	"all")
 		ca
+		aggregator-ca
 		sa
 		etcd
 		flannel
@@ -143,5 +116,5 @@ case $1 in
 		rm -rf ca kube-apiserver kube-controller-manager kube-scheduler kube-proxy etcd flannel kubernetes-admin
 		;;
 	"*")
-		echo "Usage: $0 {ca|sa|all|kube-apiserver|apiserver-kubelet|proxy-client|admin|kube-controller-manager|kube-proxy|etcd|flannel|admin|clear}"
+		echo "Usage: $0 {all|clear}"
 esac
