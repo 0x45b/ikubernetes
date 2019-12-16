@@ -217,6 +217,7 @@ spec:
       nodeSelector:
         kubernetes.io/os: linux
         # isIngressNginx: true
+      dnsPolicy: ClusterFirstWithHostNet
       containers:
         - name: nginx-ingress-controller
           image: zhh1115/nginx-ingress-controller:0.26.1
