@@ -1,14 +1,29 @@
 # ------------------- Dashboard ServiceAccount ------------------- #
-apiVersion: v1
-kind: ServiceAccount
-metadata:
-  labels:
-    k8s-app: kubernetes-dashboard
-  name: kubernetes-dashboard
-  namespace: kube-system
+# ------------------- 为了防止误删 SA，手动创建 SA ------------------- #
+# apiVersion: v1
+# kind: ServiceAccount
+# metadata:
+#   labels:
+#     k8s-app: kubernetes-dashboard
+#   name: kubernetes-dashboard
+#   namespace: kube-system
 
 ---
+# ------------------- Dashboard ClusterRoleBing (cluster-admin) ------------------- #
+kind: ClusterRoleBinding
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: kubernetes-dashboard
+subjects:
+  - kind: ServiceAccount
+    name: kubernetes-dashboard
+    namespace: kube-system
+roleRef:
+  kind: ClusterRole
+  name: cluster-admin
+  apiGroup: rbac.authorization.k8s.io
 
+---
 # ------------------- Dashboard Secret ------------------- #
 apiVersion: v1
 kind: Secret
@@ -41,21 +56,6 @@ metadata:
     k8s-app: kubernetes-dashboard
   name: kubernetes-dashboard-settings
   namespace: kube-system
-
----
-# ------------------- Dashboard ClusterRoleBing (cluster-admin) ------------------- #
-kind: ClusterRoleBinding
-apiVersion: rbac.authorization.k8s.io/v1
-metadata:
-  name: kubernetes-dashboard
-subjects:
-  - kind: ServiceAccount
-    name: kubernetes-dashboard
-    namespace: kube-system
-roleRef:
-  kind: ClusterRole
-  name: cluster-admin
-  apiGroup: rbac.authorization.k8s.io
 
 ---
 # ------------------- Dashboard Deployment ------------------- #
@@ -211,6 +211,7 @@ spec:
   selector:
     k8s-app: kubernetes-dashboard
 
+---
 # ------------------- Dashboard Ingress Nginx ------------------- #
 kind: Ingress
 apiVersion: extensions/v1beta1
