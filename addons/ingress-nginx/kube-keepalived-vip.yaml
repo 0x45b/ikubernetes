@@ -2,13 +2,13 @@
 apiVersion: v1
 kind: Namespace
 metadata:
-  name: ingress-nginx
+  name: kube-keepalived-vip
 ---
 apiVersion: v1
 kind: ServiceAccount
 metadata:
   name: kube-keepalived-vip
-  namespace: ingress-nginx
+  namespace: kube-keepalived-vip
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
@@ -31,7 +31,7 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
   name: kube-keepalived-vip
-  namespace: ingress-nginx
+  namespace: kube-keepalived-vip
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
@@ -39,13 +39,13 @@ roleRef:
 subjects:
   - kind: ServiceAccount
     name: kube-keepalived-vip
-    namespace: ingress-nginx
+    namespace: kube-keepalived-vip
 ---
 apiVersion: apps/v1
 kind: DaemonSet
 metadata:
   name: kube-keepalived-vip
-  namespace: ingress-nginx
+  namespace: kube-keepalived-vip
 spec:
   selector:
     matchLabels:
@@ -104,6 +104,6 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: vip-configmap
-  namespace: ingress-nginx
+  namespace: kube-keepalived-vip
 data:
   10.0.100.49: ingress-nginx/ingress-nginx
