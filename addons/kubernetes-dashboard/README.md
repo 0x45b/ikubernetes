@@ -4,7 +4,7 @@
 kubectl create sa -n kube-system kubernetes-dashboard
 
 2. 创建 secret
-kubectl create secret tls kubernetes-dashboard-certs -n kube-system --key <your-ingress-nginx-ssl-private-key> --cert <your-ingress-nginx-ssl-cert>
+kubectl create secret tls kubernetes-dashboard-certs -n kube-system --key <your-ingress-host-ssl-private-key> --cert <your-ingress-host-ssl-cert>
 ```
 
 # 设置 kubernetes-dashboard kubeconfig
