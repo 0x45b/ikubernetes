@@ -38,12 +38,11 @@ metadata:
   name: kuboard
   namespace: kube-system
 spec:
-  type: NodePort
+  type: ClusterIP
   ports:
   - name: http
     port: 80
     targetPort: 80
-    nodePort: 32567
   selector:
     k8s.eip.work/layer: monitor
     k8s.eip.work/name: kuboard
@@ -117,22 +116,3 @@ subjects:
 - kind: ServiceAccount
   name: kuboard-viewer
   namespace: kube-system
-
----
-apiVersion: extensions/v1beta1
-kind: Ingress
-metadata:
-  name: kuboard
-  namespace: kube-system
-  annotations:
-    nginx.org/websocket-services: "kuboard"
-    nginx.com/sticky-cookie-services: "serviceName=kuboard srv_id expires=1h path=/"
-spec:
-  rules:
-  - host: kuboard.fdisk.cc
-    http:
-      paths:
-      - path: /
-        backend:
-          serviceName: kuboard
-          servicePort: http
