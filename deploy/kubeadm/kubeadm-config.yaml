@@ -1,0 +1,117 @@
+apiVersion: kubeadm.k8s.io/v1beta2
+kind: ClusterConfiguration
+imageRepository: registry.cn-hangzhou.aliyuncs.com/google_containers
+kubernetesVersion: v1.16.3
+certificatesDir: /etc/kubernetes/pki
+clusterName: kubernetes
+networking:
+  podSubnet: 10.253.0.0/16
+  serviceSubnet: 10.254.0.0/16
+  dnsDomain: cluster.local
+controlPlaneEndpoint: "10.0.100.40:8443"
+apiServer:
+  timeoutForControlPlane: 4m0s
+  extraArgs:
+    authorization-mode: "Node,RBAC"
+    allow-privileged: "true"
+    enable-admission-plugins: "NamespaceLifecycle,LimitRanger,ServiceAccount,DefaultStorageClass,ResourceQuota,NodeRestriction,PodPreset"
+    runtime-config: api/all,settings.k8s.io/v1alpha1=true
+    enable-aggregator-routing: "true"
+    enable-bootstrap-token-auth: "true"
+    storage-backend: etcd3
+    etcd-servers: https://10.0.100.15:2379,https://10.0.100.16:2379,https://10.0.100.17:2379
+    service-node-port-range: "30000-50000"
+    kubelet-preferred-address-types: "InternalIP,ExternalIP,Hostname"
+  certSANs:
+    - 127.0.0.1
+    - 10.0.100.15
+    - 10.0.100.16
+    - 10.0.100.17
+    - 10.0.100.40
+    - 10.254.0.1
+    - kubernetes
+    - kubernetes.default
+    - kubernetes.default.svc
+    - kubernetes.default.svc.cluster
+    - kubernetes.default.svc.cluster.local
+  extraVolumes:
+  - hostPath: /etc/localtime
+    mountPath: /etc/localtime
+    name: localtime
+    readOnly: true
+controllerManager:
+  extraArgs:
+    bind-address: "0.0.0.0"
+    allocate-node-cidrs: "true"
+    experimental-cluster-signing-duration: 87600h
+    controllers: "*,bootstrapsigner,tokencleaner"
+    concurrent-service-syncs: "2"
+    concurrent-deployment-syncs: "10"
+    concurrent-gc-syncs: "30"
+    kube-api-qps: "1000"
+    kube-api-burst: "2000"
+  extraVolumes:
+  - hostPath: /etc/localtime
+    mountPath: /etc/localtime
+    name: localtime
+    readOnly: true
+scheduler:
+  extraArgs:
+    bind-address: "0.0.0.0"
+  extraVolumes:
+  - hostPath: /etc/localtime
+    mountPath: /etc/localtime
+    name: localtime
+    readOnly: true
+dns:
+  type: CoreDNS
+  imageRepository: coredns
+  imageTag: 1.6.5
+etcd:
+  local:
+    dataDir: /var/lib/etcd
+    serverCertSANs:
+      - 10.0.100.15
+      - 10.0.100.16
+      - 10.0.100.17
+    peerCertSANs:
+      - 10.0.100.15
+      - 10.0.100.16
+      - 10.0.100.17
+    extraArgs:
+      auto-compaction-retention: "1h"
+      max-request-bytes: "33554432"
+      quota-backend-bytes: "8589934592"
+      enable-v2: "false"
+  #external:
+  #  endpoints:
+  #  - "https://10.0.100.15:2379"
+  #  - "https://10.0.100.16:2379"
+  #  - "https://10.0.100.17:2379"
+  #  caFile: "/etc/etcd/certs/ca.pem"
+  #  certFile: "/etc/etcd/certs/etcd.pem"
+  #  keyFile: "/etc/etcd/certs/etcd-key.pem"
+---
+apiVersion: kubeproxy.config.k8s.io/v1alpha1
+kind: KubeProxyConfiguration
+mode: ipvs
+ipvs:
+  excludeCIDRs: null
+  minSyncPeriod: 0s
+  scheduler: "rr"
+  strictARP: false
+  syncPeriod: 15s
+iptables:
+  masqueradeAll: true
+  masqueradeBit: 14
+  minSyncPeriod: 0s
+  syncPeriod: 30s
+---
+apiVersion: kubelet.config.k8s.io/v1beta1
+kind: KubeletConfiguration
+cgroupDriver: systemd
+failSwapOn: true
+clusterDomain: cluster.local
+clusterDNS:
+  - 10.254.0.10
+rotateCertificates: true
