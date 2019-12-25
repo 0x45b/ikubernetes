@@ -65,8 +65,8 @@ scheduler:
     readOnly: true
 dns:
   type: CoreDNS
-  imageRepository: coredns
-  imageTag: 1.6.5
+  #imageRepository: coredns
+  #imageTag: 1.6.5
 etcd:
   local:
     dataDir: /var/lib/etcd
