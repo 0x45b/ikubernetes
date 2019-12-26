@@ -1,0 +1,20 @@
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: draw-io
+  labels:
+    app: draw-io
+    env: prod
+spec:
+  tls:
+    - hosts:
+      - draw.fdisk.cc
+      secretName: wildcard.fdisk.cc
+  rules:
+  - host: draw.fdisk.cc
+    http:
+      paths:
+      - path: /
+        backend:
+          serviceName: draw-io
+          servicePort: 8080
