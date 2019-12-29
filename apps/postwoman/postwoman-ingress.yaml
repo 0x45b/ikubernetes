@@ -1,0 +1,20 @@
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: postwoman
+  labels:
+    app: postwoman
+    env: prod
+spec:
+  tls:
+    - hosts:
+      - postwoman.fdisk.cc
+      secretName: wildcard.fdisk.cc
+  rules:
+  - host: postwoman.fdisk.cc
+    http:
+      paths:
+      - path: /
+        backend:
+          serviceName: postwoman
+          servicePort: 3000
