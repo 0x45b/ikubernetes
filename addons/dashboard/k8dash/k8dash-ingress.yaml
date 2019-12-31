@@ -1,0 +1,19 @@
+---
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: k8dash
+  namespace: kube-system
+spec:
+  tls:
+    - hosts:
+      - k8dash.fdisk.cc
+      secretName: wildcard.fdisk.cc
+  rules:
+  - host: k8dash.fdisk.cc
+    http:
+      paths:
+      - path: /
+        backend:
+          serviceName: k8dash
+          servicePort: 80
