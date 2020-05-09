@@ -1,0 +1,13 @@
+apiVersion: cert-manager.io/v1alpha2
+kind: Certificate
+metadata:
+  name: prod-atanhui-cn-tls
+spec:
+  secretName: prod-atanhui-cn-tls
+  commonName: atanhui.cn
+  dnsNames:
+  - atanhui.cn
+  - "*.atanhui.cn"
+  issuerRef:
+    name: letsencrypt-prod
+    kind: ClusterIssuer

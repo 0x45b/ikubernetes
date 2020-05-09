@@ -1,0 +1,24 @@
+apiVersion: cert-manager.io/v1alpha2
+kind: ClusterIssuer
+metadata:
+  name: letsencrypt-prod
+spec:
+  acme:
+    # Change to your letsencrypt email
+    email: x_hezhang@126.com
+    server: https://acme-v02.api.letsencrypt.org/directory
+    privateKeySecretRef:
+      name: letsencrypt-prod-account-key
+    solvers:
+    - dns01:
+        webhook:
+          groupName: acme.fdisk.cc
+          solverName: alidns
+          config:
+            region: ""
+            accessKeySecretRef:
+              name: alidns-secret
+              key: access-key
+            secretKeySecretRef:
+              name: alidns-secret
+              key: secret-key
