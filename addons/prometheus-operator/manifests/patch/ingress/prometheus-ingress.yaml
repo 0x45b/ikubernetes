@@ -1,0 +1,14 @@
+kind: Ingress
+apiVersion: extensions/v1beta1
+metadata:
+  name: prometheus-k8s
+  namespace: monitoring
+spec:
+  rules:
+  - host: prometheus.fdisk.cc
+    http:
+      paths:
+      - path: /
+        backend:
+          serviceName: prometheus-k8s
+          servicePort: 9090
