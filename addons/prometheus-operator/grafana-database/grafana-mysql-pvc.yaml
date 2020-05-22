@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: alicloud-disk-efficiency-grafana-mysql
+  namespace: monitoring
+spec:
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: alicloud-disk-efficiency-beijing-delete
+  resources:
+    requests:
+      storage: 20Gi

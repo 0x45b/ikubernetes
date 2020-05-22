@@ -1,0 +1,50 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name:  grafana-mysql
+  namespace: monitoring
+  labels:
+    app: grafana-mysql
+    env: prod
+spec:
+  strategy:
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        app: grafana-mysql
+        env: prod
+    spec:
+      restartPolicy: Always
+      containers:
+      - image: mariadb:10.4
+        name: grafana-mysql
+        resources:
+          requests:
+            cpu: "100m"
+            memory: "200M"
+          limits:
+            cpu: "300m"
+            memory: "400M"
+        env:
+        - name: MYSQL_ROOT_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: grafana-mysql-secret
+              key: mysql_root_password
+        - name: MYSQL_DATABASE
+          value: "grafana"
+        ports:
+        - name: db-port
+          protocol: TCP
+          containerPort: 3306
+        volumeMounts:
+        - name: data-pvc
+          mountPath: /var/lib/mysql
+      volumes:
+        - name: data-pvc
+          persistentVolumeClaim:
+            claimName: alicloud-disk-efficiency-grafana-mysql

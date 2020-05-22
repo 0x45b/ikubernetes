@@ -1,0 +1,14 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: grafana-mysql
+  namespace: monitoring
+spec:
+  selector:
+    env: prod
+    app: grafana-mysql
+  type: ClusterIP
+  ports:
+  - name: grafana-mysql
+    port: 3306
+    targetPort: db-port
