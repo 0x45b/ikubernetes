@@ -1,22 +1,23 @@
-apiVersion: extensions/v1beta1
+apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: dingtalk-webhook
   namespace: monitoring
   labels:
     app: dingtalk-webhook
-    env: prod
 spec:
   strategy:
     rollingUpdate:
       maxSurge: 2
       maxUnavailable: 1
     type: RollingUpdate
+  selector:
+    matchLabels:
+      app: dingtalk-webhook
   template:
     metadata:
       labels:
         app: dingtalk-webhook
-        env: prod
     spec:
       containers:
       - name: dingtalk-webhook
@@ -30,7 +31,7 @@ spec:
             cpu: "100m"
             memory: "300Mi"
         args:
-        - --ding.profile=webhook1=https://oapi.dingtalk.com/robot/send?access_token=<your-access-token>
+        - --ding.profile=webhook1=https://oapi.dingtalk.com/robot/send?access_token=<YOUR-ACCESS-TOKEN>
         ports:
         - name: dingtalk
           protocol: TCP
@@ -42,7 +43,6 @@ kind: Service
 metadata:
   labels:
     app: dingtalk-webhook
-    env: prod
   name: dingtalk-webhook
   namespace: monitoring
 spec:
@@ -53,4 +53,3 @@ spec:
     targetPort: dingtalk
   selector:
     app: dingtalk-webhook
-    env: prod
