@@ -4,8 +4,12 @@ metadata:
   name: alertmanager
   namespace: monitoring
 spec:
+  tls:
+  - hosts:
+    - k8s-alertmanager.fdisk.cc
+    secretName: wildcard.fdisk.cc
   rules:
-  - host: prometheus-alertmanager.fdisk.cc
+  - host: k8s-alertmanager.fdisk.cc
     http:
       paths:
       - path: /

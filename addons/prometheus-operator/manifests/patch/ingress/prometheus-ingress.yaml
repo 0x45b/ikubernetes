@@ -4,8 +4,12 @@ metadata:
   name: prometheus-k8s
   namespace: monitoring
 spec:
+  tls:
+  - hosts:
+    - k8s-prometheus.fdisk.cc
+    secretName: wildcard.fdisk.cc
   rules:
-  - host: prometheus.fdisk.cc
+  - host: k8s-prometheus.fdisk.cc
     http:
       paths:
       - path: /

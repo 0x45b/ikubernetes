@@ -4,8 +4,12 @@ metadata:
   name: grafana
   namespace: monitoring
 spec:
+  tls:
+  - hosts:
+    - k8s-grafana.fdisk.cc
+    secretName: wildcard.fdisk.cc
   rules:
-  - host: prometheus-grafana.fdisk.cc
+  - host: k8s-grafana.fdisk.cc
     http:
       paths:
       - path: /
