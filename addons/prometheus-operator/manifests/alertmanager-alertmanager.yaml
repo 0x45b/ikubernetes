@@ -16,3 +16,12 @@ spec:
     runAsUser: 1000
   serviceAccountName: alertmanager-main
   version: v0.20.0
+  # custom config
+  volumeMounts:
+  - name: localtime
+    mountPath: /etc/localtime
+    readOnly: true
+  volumes:
+  - name: localtime
+    hostPath:
+      path: /etc/localtime

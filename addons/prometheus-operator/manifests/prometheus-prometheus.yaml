@@ -32,3 +32,12 @@ spec:
   serviceMonitorNamespaceSelector: {}
   serviceMonitorSelector: {}
   version: v2.17.2
+  # custom config
+  volumeMounts:
+  - name: localtime
+    mountPath: /etc/localtime
+    readOnly: true
+  volumes:
+  - name: localtime
+    hostPath:
+      path: /etc/localtime
