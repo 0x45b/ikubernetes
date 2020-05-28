@@ -21,7 +21,7 @@ spec:
         app: redis-exporter-prometheus
     spec:
       containers:
-      - name: redis-exporter-livesone-app
+      - name: redis-exporter-prometheus
         image: oliver006/redis_exporter:latest
         resources:
           requests:
