@@ -17,7 +17,7 @@
   "gnetId": 763,
   "graphTooltip": 0,
   "id": 31,
-  "iteration": 1590650909099,
+  "iteration": 1590655302328,
   "links": [],
   "panels": [
     {
@@ -394,99 +394,8 @@
         "rgba(50, 172, 45, 0.97)"
       ],
       "datasource": "prometheus",
-      "decimals": 0,
-      "description": "Blocked clients",
-      "editable": true,
-      "error": false,
-      "format": "none",
-      "gauge": {
-        "maxValue": 100,
-        "minValue": 0,
-        "show": false,
-        "thresholdLabels": false,
-        "thresholdMarkers": true
-      },
-      "gridPos": {
-        "h": 6,
-        "w": 4,
-        "x": 16,
-        "y": 0
-      },
-      "hideTimeOverride": true,
-      "id": 18,
-      "interval": null,
-      "isNew": true,
-      "links": [],
-      "mappingType": 1,
-      "mappingTypes": [
-        {
-          "name": "value to text",
-          "value": 1
-        },
-        {
-          "name": "range to text",
-          "value": 2
-        }
-      ],
-      "maxDataPoints": 100,
-      "nullPointMode": "connected",
-      "nullText": null,
-      "options": {},
-      "postfix": "",
-      "postfixFontSize": "50%",
-      "prefix": "",
-      "prefixFontSize": "50%",
-      "rangeMaps": [
-        {
-          "from": "null",
-          "text": "N/A",
-          "to": "null"
-        }
-      ],
-      "sparkline": {
-        "fillColor": "rgba(31, 118, 189, 0.18)",
-        "full": false,
-        "lineColor": "rgb(31, 120, 193)",
-        "show": true
-      },
-      "tableColumn": "",
-      "targets": [
-        {
-          "expr": "redis_blocked_clients{instance=~\"$instance\"}",
-          "format": "time_series",
-          "intervalFactor": 2,
-          "legendFormat": "",
-          "metric": "",
-          "refId": "A",
-          "step": 2
-        }
-      ],
-      "thresholds": "",
-      "timeFrom": "1m",
-      "timeShift": null,
-      "title": "Blocked Clients",
-      "type": "singlestat",
-      "valueFontSize": "80%",
-      "valueMaps": [
-        {
-          "op": "=",
-          "text": "N/A",
-          "value": "null"
-        }
-      ],
-      "valueName": "current"
-    },
-    {
-      "cacheTimeout": null,
-      "colorBackground": false,
-      "colorValue": false,
-      "colors": [
-        "rgba(50, 172, 45, 0.97)",
-        "rgba(237, 129, 40, 0.89)",
-        "rgba(245, 54, 54, 0.9)"
-      ],
-      "datasource": "prometheus",
-      "decimals": 0,
+      "decimals": 2,
+      "description": "",
       "editable": true,
       "error": false,
       "format": "percent",
@@ -500,7 +409,7 @@
       "gridPos": {
         "h": 6,
         "w": 4,
-        "x": 20,
+        "x": 16,
         "y": 0
       },
       "hideTimeOverride": true,
@@ -543,8 +452,9 @@
       "tableColumn": "",
       "targets": [
         {
-          "expr": "100 * (redis_memory_used_bytes{instance=~\"$instance\"}  / redis_memory_max_bytes{instance=~\"$instance\"} )",
+          "expr": "100 * (redis_keyspace_hits_total{instance=\"$instance\"} / (redis_keyspace_hits_total{instance=\"$instance\"} + redis_keyspace_misses_total{instance=\"$instance\"}))",
           "format": "time_series",
+          "instant": false,
           "intervalFactor": 2,
           "legendFormat": "",
           "metric": "",
@@ -552,12 +462,12 @@
           "step": 2
         }
       ],
-      "thresholds": "80,95",
-      "timeFrom": "1m",
+      "thresholds": "50,70",
+      "timeFrom": null,
       "timeShift": null,
-      "title": "Memory Usage",
+      "title": "Hit Rate %",
       "type": "singlestat",
-      "valueFontSize": "80%",
+      "valueFontSize": "70%",
       "valueMaps": [
         {
           "op": "=",
@@ -1719,7 +1629,7 @@
       }
     }
   ],
-  "refresh": "30s",
+  "refresh": "5s",
   "schemaVersion": 22,
   "style": "dark",
   "tags": [
@@ -1731,8 +1641,10 @@
       {
         "allValue": null,
         "current": {
-          "text": "redis-exporter-assistant-cache",
-          "value": "redis-exporter-assistant-cache"
+          "selected": true,
+          "tags": [],
+          "text": "redis-exporter-mastercache",
+          "value": "redis-exporter-mastercache"
         },
         "datasource": "prometheus",
         "definition": "label_values(redis_instance_info, kubernetes_name)",
@@ -1756,8 +1668,8 @@
       {
         "allValue": null,
         "current": {
-          "text": "10.254.1.162:9121",
-          "value": "10.254.1.162:9121"
+          "text": "10.254.1.171:9121",
+          "value": "10.254.1.171:9121"
         },
         "datasource": "prometheus",
         "definition": "label_values(redis_up{kubernetes_name=\"$app\"}, instance)",
@@ -1781,7 +1693,7 @@
     ]
   },
   "time": {
-    "from": "now-24h",
+    "from": "now-5m",
     "to": "now"
   },
   "timepicker": {
@@ -1812,5 +1724,5 @@
   "timezone": "browser",
   "title": "Redis Dashboard for Prometheus Redis Exporter",
   "uid": "tCPmyTzGz",
-  "version": 11
+  "version": 14
 }
