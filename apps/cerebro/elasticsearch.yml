@@ -1,0 +1,32 @@
+apiVersion: v1
+kind: Endpoints
+metadata:
+  name: elasticsearch-ep
+  labels:
+    app: elasticsearch-ep
+subsets:
+- addresses:
+  - ip: 10.0.100.11
+    hostname: elasticsearch-01
+  - ip: 10.0.100.12
+    hostname: elasticsearch-02
+  - ip: 10.0.100.13
+    hostname: elasticsearch-03
+  ports:
+  - name: es-port
+    protocol: TCP
+    port: 9200
+
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: elasticsearch-ep
+spec:
+  selector:
+    app: elasticsearch-ep
+  type: ClusterIP
+  ports:
+  - name: es-port
+    port: 9200
+    targetPort: 9200

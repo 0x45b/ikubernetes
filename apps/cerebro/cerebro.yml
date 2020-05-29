@@ -1,0 +1,53 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cerebro
+  labels:
+    app: elasticsearch-cerebro
+spec:
+  selector:
+    matchLabels:
+      app: elasticsearch-cerebro
+  template:
+    metadata:
+      labels:
+        app: elasticsearch-cerebro
+    spec:
+      restartPolicy: Always
+      containers:
+      - image: lmenezes/cerebro:0.8.3
+        name: cerebro
+        ports:
+        - name: cerebro
+          containerPort: 9000
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: cerebro
+  labels:
+    app: cerebro
+spec:
+  selector:
+    app: elasticsearch-cerebro
+  type: ClusterIP
+  ports:
+  - name: cerebro
+    port: 9000
+    targetPort: 9000
+---
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: cerebro
+  labels:
+    app: cerebro
+spec:
+  rules:
+  - host: cerebro.fdisk.cc
+    http:
+      paths:
+      - path: /
+        backend:
+          serviceName: cerebro
+          servicePort: cerebro
