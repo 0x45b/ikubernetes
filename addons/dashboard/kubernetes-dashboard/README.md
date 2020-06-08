@@ -1,8 +1,8 @@
-# 自签明证书
+# dashboard 使用 https
 ##  创建secret
 ```text
 # 如果用的是 cert-manager，则可以忽略这步。
-kubectl create secret tls kubernetes-dashboard-certs -n kubernetes-dashboard --key <your-ingress-host-ssl-private-key> --cert <your-ingress-host-ssl-cert>
+kubectl create secret tls kubernetes-dashboard-tls-certs -n kubernetes-dashboard --key <your-ingress-host-ssl-private-key> --cert <your-ingress-host-ssl-cert>
 ```
 
 # 设置 kubernetes-dashboard kubeconfig

@@ -15,7 +15,7 @@ spec:
   tls:
   - hosts:
       - k8s-dashboard.fdisk.cc
-    secretName: k8s-dashboard.fdisk.cc
+    secretName: kubernetes-dashboard-tls-certs
   rules:
     - host: k8s-dashboard.fdisk.cc
       http:
