@@ -1,37 +1,68 @@
-# ------------------- Dashboard ServiceAccount ------------------- #
-# ------------------- 为了防止误删 SA，手动创建 SA ------------------- #
-# apiVersion: v1
-# kind: ServiceAccount
-# metadata:
-#   labels:
-#     k8s-app: kubernetes-dashboard
-#   name: kubernetes-dashboard
-#   namespace: kube-system
+# Copyright 2017 The Kubernetes Authors.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
 
----
-# ------------------- Dashboard ClusterRoleBing (cluster-admin) ------------------- #
-kind: ClusterRoleBinding
-apiVersion: rbac.authorization.k8s.io/v1
+apiVersion: v1
+kind: Namespace
 metadata:
   name: kubernetes-dashboard
-subjects:
-  - kind: ServiceAccount
-    name: kubernetes-dashboard
-    namespace: kube-system
-roleRef:
-  kind: ClusterRole
-  name: cluster-admin
-  apiGroup: rbac.authorization.k8s.io
 
 ---
-# ------------------- Dashboard Secret ------------------- #
+
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  labels:
+    k8s-app: kubernetes-dashboard
+  name: kubernetes-dashboard
+  namespace: kubernetes-dashboard
+
+---
+
+kind: Service
+apiVersion: v1
+metadata:
+  labels:
+    k8s-app: kubernetes-dashboard
+  name: kubernetes-dashboard
+  namespace: kubernetes-dashboard
+spec:
+  ports:
+    - port: 443
+      targetPort: 8443
+  selector:
+    k8s-app: kubernetes-dashboard
+
+---
+
+apiVersion: v1
+kind: Secret
+metadata:
+  labels:
+    k8s-app: kubernetes-dashboard
+  name: kubernetes-dashboard-certs
+  namespace: kubernetes-dashboard
+type: Opaque
+
+---
+
 apiVersion: v1
 kind: Secret
 metadata:
   labels:
     k8s-app: kubernetes-dashboard
   name: kubernetes-dashboard-csrf
-  namespace: kube-system
+  namespace: kubernetes-dashboard
 type: Opaque
 data:
   csrf: ""
@@ -44,28 +75,106 @@ metadata:
   labels:
     k8s-app: kubernetes-dashboard
   name: kubernetes-dashboard-key-holder
-  namespace: kube-system
+  namespace: kubernetes-dashboard
 type: Opaque
 
 ---
-# ------------------- Dashboard ConfigMap ------------------- #
+
 kind: ConfigMap
 apiVersion: v1
 metadata:
   labels:
     k8s-app: kubernetes-dashboard
   name: kubernetes-dashboard-settings
-  namespace: kube-system
+  namespace: kubernetes-dashboard
 
 ---
-# ------------------- Dashboard Deployment ------------------- #
+
+kind: Role
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  labels:
+    k8s-app: kubernetes-dashboard
+  name: kubernetes-dashboard
+  namespace: kubernetes-dashboard
+rules:
+  # Allow Dashboard to get, update and delete Dashboard exclusive secrets.
+  - apiGroups: [""]
+    resources: ["secrets"]
+    resourceNames: ["kubernetes-dashboard-key-holder", "kubernetes-dashboard-certs", "kubernetes-dashboard-csrf"]
+    verbs: ["get", "update", "delete"]
+    # Allow Dashboard to get and update 'kubernetes-dashboard-settings' config map.
+  - apiGroups: [""]
+    resources: ["configmaps"]
+    resourceNames: ["kubernetes-dashboard-settings"]
+    verbs: ["get", "update"]
+    # Allow Dashboard to get metrics.
+  - apiGroups: [""]
+    resources: ["services"]
+    resourceNames: ["heapster", "dashboard-metrics-scraper"]
+    verbs: ["proxy"]
+  - apiGroups: [""]
+    resources: ["services/proxy"]
+    resourceNames: ["heapster", "http:heapster:", "https:heapster:", "dashboard-metrics-scraper", "http:dashboard-metrics-scraper"]
+    verbs: ["get"]
+
+---
+
+kind: ClusterRole
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  labels:
+    k8s-app: kubernetes-dashboard
+  name: kubernetes-dashboard
+rules:
+  # Allow Metrics Scraper to get metrics from the Metrics server
+  - apiGroups: ["metrics.k8s.io"]
+    resources: ["pods", "nodes"]
+    verbs: ["get", "list", "watch"]
+
+---
+
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  labels:
+    k8s-app: kubernetes-dashboard
+  name: kubernetes-dashboard
+  namespace: kubernetes-dashboard
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: kubernetes-dashboard
+subjects:
+  - kind: ServiceAccount
+    name: kubernetes-dashboard
+    namespace: kubernetes-dashboard
+
+---
+
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: kubernetes-dashboard
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  #name: kubernetes-dashboard
+  name: cluster-admin
+subjects:
+  - kind: ServiceAccount
+    name: kubernetes-dashboard
+    namespace: kubernetes-dashboard
+
+---
+
 kind: Deployment
 apiVersion: apps/v1
 metadata:
   labels:
     k8s-app: kubernetes-dashboard
   name: kubernetes-dashboard
-  namespace: kube-system
+  namespace: kubernetes-dashboard
 spec:
   replicas: 1
   revisionHistoryLimit: 10
@@ -79,16 +188,14 @@ spec:
     spec:
       containers:
         - name: kubernetes-dashboard
-          image: kubernetesui/dashboard:v2.0.0-beta6
+          image: kubernetesui/dashboard:v2.0.0
           imagePullPolicy: Always
           ports:
             - containerPort: 8443
               protocol: TCP
           args:
             - --auto-generate-certificates
-            - --namespace=kube-system
-            - --tls-cert-file=/tls.crt
-            - --tls-key-file=/tls.key
+            - --namespace=kubernetes-dashboard
             # Uncomment the following line to manually specify Kubernetes API server Host
             # If not specified, Dashboard will attempt to auto discover the API server and connect
             # to it. Uncomment only if the default does not work.
@@ -119,21 +226,21 @@ spec:
           emptyDir: {}
       serviceAccountName: kubernetes-dashboard
       nodeSelector:
-        "beta.kubernetes.io/os": linux
+        "kubernetes.io/os": linux
       # Comment the following tolerations if Dashboard must not be deployed on master
       tolerations:
         - key: node-role.kubernetes.io/master
           effect: NoSchedule
 
 ---
-# ------------------- Dashboard Service and Deployment for dashboard-metrics ------------------- #
+
 kind: Service
 apiVersion: v1
 metadata:
   labels:
     k8s-app: dashboard-metrics-scraper
   name: dashboard-metrics-scraper
-  namespace: kube-system
+  namespace: kubernetes-dashboard
 spec:
   ports:
     - port: 8000
@@ -149,7 +256,7 @@ metadata:
   labels:
     k8s-app: dashboard-metrics-scraper
   name: dashboard-metrics-scraper
-  namespace: kube-system
+  namespace: kubernetes-dashboard
 spec:
   replicas: 1
   revisionHistoryLimit: 10
@@ -165,7 +272,7 @@ spec:
     spec:
       containers:
         - name: dashboard-metrics-scraper
-          image: kubernetesui/metrics-scraper:v1.0.1
+          image: kubernetesui/metrics-scraper:v1.0.4
           ports:
             - containerPort: 8000
               protocol: TCP
@@ -186,7 +293,7 @@ spec:
             runAsGroup: 2001
       serviceAccountName: kubernetes-dashboard
       nodeSelector:
-        "beta.kubernetes.io/os": linux
+        "kubernetes.io/os": linux
       # Comment the following tolerations if Dashboard must not be deployed on master
       tolerations:
         - key: node-role.kubernetes.io/master
@@ -194,45 +301,3 @@ spec:
       volumes:
         - name: tmp-volume
           emptyDir: {}
-
----
-# ------------------- Dashboard Service for dashboard ------------------- #
-kind: Service
-apiVersion: v1
-metadata:
-  labels:
-    k8s-app: kubernetes-dashboard
-  name: kubernetes-dashboard
-  namespace: kube-system
-spec:
-  ports:
-    - port: 443
-      targetPort: 8443
-  selector:
-    k8s-app: kubernetes-dashboard
-
----
-# ------------------- Dashboard Ingress Nginx ------------------- #
-kind: Ingress
-apiVersion: extensions/v1beta1
-metadata:
-  labels:
-    k8s-app: kubernetes-dashboard
-  name: kubernetes-dashboard-ingress
-  namespace: kube-system
-  annotations:
-    nginx.ingress.kubernetes.io/ssl-redirect: "true"
-    nginx.ingress.kubernetes.io/rewrite-target: /
-    nginx.ingress.kubernetes.io/backend-protocol: "HTTPS"
-spec:
-  tls:
-  - hosts:
-      - dashboard.fdisk.cc
-    secretName: kubernetes-dashboard-certs
-  rules:
-    - host: dashboard.fdisk.cc
-      http:
-        paths:
-        - backend:
-            serviceName: kubernetes-dashboard
-            servicePort: 8443
