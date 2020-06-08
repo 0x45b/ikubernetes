@@ -1,0 +1,65 @@
+apiVersion: kibana.k8s.elastic.co/v1
+kind: Kibana
+metadata:
+  name: elastic-prod
+spec:
+  version: 7.7.1
+  count: 1
+  image: registry-vpc.cn-beijing.aliyuncs.com/maka-infra/kibana:7.7.1
+  http:
+    tls:
+      selfSignedCertificate:
+        disabled: true
+  config:
+    xpack.security.enabled: false
+  elasticsearchRef:
+    name: elastic-prod
+  podTemplate:
+    spec:
+      containers:
+      - name: kibana
+        resources:
+          requests:
+            memory: 1Gi
+            cpu: 0.5
+          limits:
+            memory: 4Gi
+            cpu: 2
+        readinessProbe:
+          failureThreshold: 3
+          httpGet:
+            path: /
+            port: 5601
+            scheme: HTTP
+          initialDelaySeconds: 30
+          periodSeconds: 10
+          successThreshold: 1
+          timeoutSeconds: 5
+
+---
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+    kubernetes.io/ingress.class: nginx
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/whitelist-source-range: |
+      39.106.82.47,101.201.142.55,
+      203.100.83.41,203.100.83.42,
+      172.16.0.0/12
+  name: kibana
+  namespace: elastic-system
+spec:
+  rules:
+  - host: kibana.fdisk.cc
+    http:
+      paths:
+      - backend:
+          serviceName: elastic-prod-kb-http
+          servicePort: 5601
+        path: /
+  tls:
+  - hosts:
+    - kibana.fdisk.cc
+    secretName: kibana.fdisk.cc

@@ -1,0 +1,84 @@
+apiVersion: elasticsearch.k8s.elastic.co/v1
+kind: Elasticsearch
+metadata:
+  name: elastic-prod
+  namespace: elastic-system
+spec:
+  version: 7.7.1
+  image: registry-vpc.cn-beijing.aliyuncs.com/maka-infra/elasticsearch-plugins:7.7.1
+  http:
+    tls:
+      selfSignedCertificate:
+        disabled: true
+  nodeSets:
+  - name: masters
+    count: 3
+    config:
+      node.master: true
+      node.data: false
+      node.ingest: true
+      node.ml: false
+      cluster.remote.connect: false
+      xpack.security.enabled: false
+    podTemplate:
+      spec:
+        containers:
+        - name: elasticsearch
+          imagePullPolicy: Always
+          env:
+          - name: ES_JAVA_OPTS
+            value: -Xms4g -Xmx4g
+          resources:
+            requests:
+              memory: 8Gi
+              cpu: 1
+            limits:
+              memory: 8Gi
+              cpu: 2
+        initContainers:
+        - name: sysctl
+          securityContext:
+            privileged: true
+          command: ['sh', '-c', 'sysctl -w vm.max_map_count=262144']
+        volumes:
+        - name: elasticsearch-data
+          emptyDir: {}
+
+  - name: datas
+    count: 3
+    config:
+      node.master: false
+      node.data: true
+      node.ingest: true
+      node.ml: false
+      cluster.remote.connect: false
+      xpack.security.enabled: false
+    volumeClaimTemplates:
+    - metadata:
+        name: elasticsearch-data
+      spec:
+        accessModes:
+        - ReadWriteOnce
+        resources:
+          requests:
+            storage: 500Gi
+        storageClassName: alicloud-disk-efficiency-beijing-retain
+    podTemplate:
+      spec:
+        containers:
+        - name: elasticsearch
+          env:
+          - name: ES_JAVA_OPTS
+            value: -Xms4g -Xmx4g
+          resources:
+            requests:
+              memory: 8Gi
+              cpu: 1
+            limits:
+              memory: 8Gi
+              cpu: 2
+        initContainers:
+        - name: sysctl
+          securityContext:
+            privileged: true
+          command: ['sh', '-c', 'sysctl -w vm.max_map_count=262144']

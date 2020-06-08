@@ -53,13 +53,7 @@ apiVersion: extensions/v1beta1
 kind: Ingress
 metadata:
   annotations:
-    cert-manager.io/cluster-issuer: letsencrypt-prod
     kubernetes.io/ingress.class: nginx
-    nginx.ingress.kubernetes.io/ssl-redirect: "true"
-    nginx.ingress.kubernetes.io/whitelist-source-range: |
-      39.106.82.47,101.201.142.55,
-      203.100.83.41,203.100.83.42,
-      172.16.0.0/12
   labels:
     app: cerebro
     env: prod
@@ -74,7 +68,3 @@ spec:
           serviceName: cerebro
           servicePort: 9000
         path: /
-  tls:
-  - hosts:
-    - cerebro.fdisk.cc
-    secretName: cerebro.fdisk.cc
