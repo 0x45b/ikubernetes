@@ -32,6 +32,9 @@ spec:
   serviceMonitorNamespaceSelector: {}
   serviceMonitorSelector: {}
   version: v2.17.2
+  additionalScrapeConfigs:
+    name: prometheus-additional-config
+    key: prometheus-additional-config.yaml
   # custom config
   volumeMounts:
   - name: localtime
