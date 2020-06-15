@@ -8,8 +8,8 @@ metadata:
 spec:
   type: ClusterIP
   clusterIP: None
-  selector:
-    k8s-app: kube-scheduler
+  #selector:
+  #  k8s-app: kube-scheduler
   ports:
   - name: https-metrics
     port: 10259
