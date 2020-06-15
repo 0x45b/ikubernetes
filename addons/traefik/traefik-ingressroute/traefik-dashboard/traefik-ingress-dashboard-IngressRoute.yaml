@@ -1,0 +1,15 @@
+apiVersion: traefik.containo.us/v1alpha1
+kind: IngressRoute
+metadata:
+  name: traefik-ingress-dashboard
+  namespace: kube-system
+spec:
+  entryPoints:
+  - http
+  routes:
+  - match: Host(`k8s-traefik.fdisk.cc`)
+    kind: Rule
+    services:
+    - name: traefik-ingress-dashboard
+      namespace: kube-system
+      port: 8080
