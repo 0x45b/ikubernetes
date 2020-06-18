@@ -1,0 +1,18 @@
+apiVersion: autoscaling.alibabacloud.com/v1beta1
+kind: CronHorizontalPodAutoscaler
+metadata:
+  labels:
+    app: cerebro
+  name: cronhpa-sample
+spec:
+   scaleTargetRef:
+      apiVersion: apps/v1
+      kind: Deployment
+      name: cerebro
+   jobs:
+   - name: "scale-down"
+     schedule: "0 37 02 * * *"
+     targetSize: 1
+   - name: "scale-up"
+     schedule: "0 34 02 * * *"
+     targetSize: 3
