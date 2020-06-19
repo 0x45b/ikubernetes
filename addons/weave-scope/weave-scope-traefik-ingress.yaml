@@ -1,0 +1,13 @@
+apiVersion: traefik.containo.us/v1alpha1
+kind: IngressRoute
+metadata:
+  name: weave-scope-dashboard
+  namespace: weave
+spec:
+  routes:
+  - kind: Rule
+    match: Host(`k8s-weave.fdisk.cc`)
+    services:
+    - name: weave-scope-app
+      namespace: weave
+      port: 80

@@ -5,9 +5,7 @@ metadata:
   namespace: weave
 spec:
   tls:
-    - hosts:
-      - scope.fdisk.cc
-      secretName: wildcard.fdisk.cc
+  - secretName: wildcard.fdisk.cc
   rules:
   - host: scope.fdisk.cc
     http:
