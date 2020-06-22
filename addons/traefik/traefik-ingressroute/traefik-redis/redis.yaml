@@ -1,0 +1,40 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: redis-standalone
+  namespace: default
+  labels:
+    app: redis-standalone
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: redis-standalone
+  template:
+    metadata:
+      labels:
+        app: redis-standalone
+    spec:
+      containers:
+      - name: redis
+        image: redis:5
+        ports:
+        - name: redis
+          containerPort: 6379
+          protocol: TCP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: redis-standalone
+  labels:
+    app: redis-standalone
+spec:
+  type: ClusterIP
+  selector:
+    app: redis-standalone
+  ports:
+  - name: redis-standalone
+    port: 6379
+    protocol: TCP
+    targetPort: 6379
