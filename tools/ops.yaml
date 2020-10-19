@@ -1,0 +1,17 @@
+configs:
+  - env: test
+    type: file
+    src: devops/production/config.js
+    dst: test_config.js
+  - env: test
+    type: file
+    src: devops/production/config1.js
+    dst: test_config1.js
+  - env: staging
+    type: file
+    src: devops/production/config.js
+    dst: staging_config.js
+  - env: prod
+    type: file
+    src: devops/production/config.js
+    dst: prod_config.js
