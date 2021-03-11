@@ -41,27 +41,32 @@ spec:
       labels:
         k8s-app: metrics-server
         version: v0.3.6
-      annotations:
-        seccomp.security.alpha.kubernetes.io/pod: 'docker/default'
     spec:
+      securityContext:
+        seccompProfile:
+          type: RuntimeDefault
       priorityClassName: system-cluster-critical
       serviceAccountName: metrics-server
       nodeSelector:
         kubernetes.io/os: linux
       containers:
       - name: metrics-server
-        image: mirrorgooglecontainers/metrics-server-amd64:v0.3.6
+        image: zhh1115/metrics-server-amd64:v0.3.6
         command:
         - /metrics-server
         - --metric-resolution=30s
+        # These are needed for GKE, which doesn't support secure communication yet.
+        # Remove these lines for non-GKE clusters, and when GKE supports token-based auth.
+        #- --kubelet-port=10255
+        #- --deprecated-kubelet-completely-insecure=true
         - --kubelet-insecure-tls
-        - --kubelet-preferred-address-types=InternalIP
+        - --kubelet-preferred-address-types=InternalIP,Hostname,InternalDNS,ExternalDNS,ExternalIP
         ports:
         - containerPort: 443
           name: https
           protocol: TCP
       - name: metrics-server-nanny
-        image: mirrorgooglecontainers/addon-resizer:1.8.6
+        image: zhh1115/addon-resizer:1.8.11
         resources:
           limits:
             cpu: 100m
@@ -84,18 +89,17 @@ spec:
         command:
           - /pod_nanny
           - --config-dir=/etc/config
-          - --cpu=50m
-          - --extra-cpu=0.5m
-          - --memory=50Mi
-          - --extra-memory=5Mi
+          - --cpu=100m
+          - --extra-cpu=50m
+          - --memory=256Mi
+          - --extra-memory=256Mi
           - --threshold=5
           - --deployment=metrics-server-v0.3.6
           - --container=metrics-server
           - --poll-period=300000
           - --estimator=exponential
-          # Specifies the smallest cluster (defined in number of nodes)
-          # resources will be scaled to.
-          #- --minClusterSize={{ metrics_server_min_cluster_size }}
+          # Use kube-apiserver metrics to avoid periodically listing nodes.
+          - --use-metrics=true
       volumes:
         - name: metrics-server-config-volume
           configMap:
