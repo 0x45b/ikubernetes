@@ -1,0 +1,29 @@
+kind: Ingress
+apiVersion: networking.k8s.io/v1
+metadata:
+  labels:
+    k8s-app: kubernetes-dashboard
+  name: kubernetes-dashboard-ingress
+  namespace: kubernetes-dashboard
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/rewrite-target: /
+    nginx.ingress.kubernetes.io/backend-protocol: "HTTPS"
+    kubernetes.io/ingress.class: nginx
+spec:
+  tls:
+  - hosts:
+      - dashboard.fdisk.cc
+    secretName: wildcard-fdisk-cc
+  rules:
+    - host: dashboard.fdisk.cc
+      http:
+        paths:
+        - pathType: Prefix
+          path: /
+          backend:
+            service:
+              name: kubernetes-dashboard
+              port:
+                number: 443

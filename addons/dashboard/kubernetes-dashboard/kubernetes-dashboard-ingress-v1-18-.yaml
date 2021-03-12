@@ -1,5 +1,5 @@
 kind: Ingress
-apiVersion: extensions/v1beta1
+apiVersion: networking.k8s.io/v1
 metadata:
   labels:
     k8s-app: kubernetes-dashboard
@@ -14,12 +14,13 @@ metadata:
 spec:
   tls:
   - hosts:
-      - k8s-dashboard.fdisk.cc
-    secretName: kubernetes-dashboard-tls-certs
+      - dashboard.fdisk.cc
+    secretName: wildcard-fdisk-cc
   rules:
-    - host: k8s-dashboard.fdisk.cc
+    - host: dashboard.fdisk.cc
       http:
         paths:
         - backend:
-            serviceName: kubernetes-dashboard
-            servicePort: 8443
+            service:
+              name: kubernetes-dashboard
+              port: 8443
