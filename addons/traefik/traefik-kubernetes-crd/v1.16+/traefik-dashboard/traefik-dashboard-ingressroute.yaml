@@ -1,0 +1,17 @@
+apiVersion: traefik.containo.us/v1alpha1
+kind: IngressRoute
+metadata:
+  name: traefik-ingress-dashboard
+  namespace: kube-system
+spec:
+  entryPoints:
+    - http
+  routes:
+    - kind: Rule
+      match: Host(`traefik-dashboard.fdisk.cc`)
+      services:
+      - name: traefik-ingress-dashboard
+        kind: Service
+        namespace: kube-system
+        port: dashboard
+        passHostHeader: true
