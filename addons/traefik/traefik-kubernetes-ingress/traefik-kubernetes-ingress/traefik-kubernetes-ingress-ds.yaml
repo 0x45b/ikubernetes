@@ -1,8 +1,8 @@
 kind: DaemonSet
 apiVersion: apps/v1
 metadata:
-  name: traefik
-  namespace: kube-system
+  name: traefik-ingress
+  namespace: traefik-ingress
   labels:
     k8s-app: traefik-ingress
 spec:
@@ -15,30 +15,22 @@ spec:
         k8s-app: traefik-ingress
     spec:
       serviceAccountName: traefik-ingress-controller
-      affinity:
-        nodeAffinity:
-          requiredDuringSchedulingIgnoredDuringExecution:
-            nodeSelectorTerms:
-            - matchExpressions:
-              - key: ingress
-                operator: In
-                values:
-                - "true"
+      nodeSelector:
+        ingress-controller: traefik
       tolerations:
-      - key: ingress
-        value: "true"
-        effect: NoSchedule
+      - key: node-role.kubernetes.io/master
+        operator: Exists
       containers:
         - name: traefik-ingress
-          image: traefik:v2.2
+          image: traefik:v2.4
           args:
             - --log.level=WARN
+            - --accesslog=true
             - --api
             - --api.insecure=true
             - --api.dashboard=true
             - --ping=true
             - --metrics.prometheus=true
-            - --accesslog=true
             - --providers.kubernetesingress
             - --entrypoints.http.address=:80
             - --entrypoints.https.address=:443
@@ -59,5 +51,5 @@ spec:
               containerPort: 80
             - name: https
               containerPort: 443
-            - name: admin
+            - name: dashboard
               containerPort: 8080

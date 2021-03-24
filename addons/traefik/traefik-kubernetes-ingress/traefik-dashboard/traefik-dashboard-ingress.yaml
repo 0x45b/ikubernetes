@@ -1,0 +1,23 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: traefik-ingress-dashboard
+  namespace: traefik-ingress
+  annotations:
+    kubernetes.io/ingress.class: "traefik"
+    traefik.ingress.kubernetes.io/router.entrypoints: http,https
+    traefik.ingress.kubernetes.io/router.tls: "true"
+spec:
+  tls:
+    - secretName: wildcard-fdisk-cc
+  rules:
+    - host: traefik-dashboard.fdisk.cc
+      http:
+        paths:
+        - path: /
+          pathType: Prefix
+          backend:
+            service:
+              name: traefik-ingress-dashboard
+              port:
+                name: dashboard

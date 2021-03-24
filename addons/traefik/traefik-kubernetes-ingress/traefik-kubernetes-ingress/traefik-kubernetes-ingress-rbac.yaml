@@ -1,12 +1,18 @@
 apiVersion: v1
+kind: Namespace
+metadata:
+  name: traefik-ingress
+
+---
+apiVersion: v1
 kind: ServiceAccount
 metadata:
+  namespace: traefik-ingress
   name: traefik-ingress-controller
-  namespace: kube-system
 
 ---
 kind: ClusterRole
-apiVersion: rbac.authorization.k8s.io/v1beta1
+apiVersion: rbac.authorization.k8s.io/v1
 metadata:
   name: traefik-ingress-controller
 rules:
@@ -22,8 +28,10 @@ rules:
       - watch
   - apiGroups:
       - extensions
+      - networking.k8s.io
     resources:
       - ingresses
+      - ingressclasses
     verbs:
       - get
       - list
@@ -34,10 +42,25 @@ rules:
       - ingresses/status
     verbs:
       - update
+  - apiGroups:
+      - traefik.containo.us
+    resources:
+      - middlewares
+      - ingressroutes
+      - traefikservices
+      - ingressroutetcps
+      - ingressrouteudps
+      - tlsoptions
+      - tlsstores
+      - serverstransports
+    verbs:
+      - get
+      - list
+      - watch
 
 ---
 kind: ClusterRoleBinding
-apiVersion: rbac.authorization.k8s.io/v1beta1
+apiVersion: rbac.authorization.k8s.io/v1
 metadata:
   name: traefik-ingress-controller
 roleRef:
@@ -47,4 +70,4 @@ roleRef:
 subjects:
   - kind: ServiceAccount
     name: traefik-ingress-controller
-    namespace: kube-system
+    namespace: traefik-ingress
