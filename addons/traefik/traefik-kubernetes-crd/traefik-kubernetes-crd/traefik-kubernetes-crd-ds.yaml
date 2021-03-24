@@ -36,6 +36,8 @@ spec:
             - --providers.kubernetescrd
             - --entrypoints.http.address=:80
             - --entrypoints.https.address=:443
+            # - --entrypoints.http.http.redirections.entryPoint.to=https
+            # - --entrypoints.http.http.redirections.entryPoint.scheme=https
           readinessProbe:
             httpGet:
               path: /ping
