@@ -1,0 +1,9 @@
+apiVersion: traefik.containo.us/v1alpha1
+kind: Middleware
+metadata:
+  name: ip-white-list
+  namespace: traefik-ingress
+spec:
+  ipWhiteList:
+    sourceRange:
+      - 10.0.100.0/24

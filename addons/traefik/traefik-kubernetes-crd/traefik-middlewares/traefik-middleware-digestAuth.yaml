@@ -1,0 +1,20 @@
+apiVersion: traefik.containo.us/v1alpha1
+kind: Middleware
+metadata:
+  name: digest-auth
+  namespace: traefik-ingress
+spec:
+  digestAuth:
+    realm: traefik
+    secret: traefik-digest-auth
+
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: traefik-digest-auth
+  namespace: traefik-ingress
+data:
+  users: |
+    dHJhZWZpazp0cmFlZmlrOjJjYTk2MDRkY2NjNWEzMjlkODM1NGY2NDBmMDJmMWIxCmFkbWluOnRy
+    YWVmaWs6ODE3Mzc0MTExZjMxY2MyODIxNjI0ODY0MjVlZTVlOWUK

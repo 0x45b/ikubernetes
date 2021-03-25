@@ -1,0 +1,18 @@
+apiVersion: traefik.containo.us/v1alpha1
+kind: Middleware
+metadata:
+  name: basic-auth
+  namespace: traefik-ingress
+spec:
+  basicAuth:
+    secret: traefik-basic-auth
+
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: traefik-basic-auth
+  namespace: traefik-ingress
+data:
+  users: |
+    dHJhZWZpazokYXByMSQ5LmV5SzZmLiQuNkp5d1Y1T3h5R3AxZi5zN21PQjMwCg==
