@@ -7,7 +7,7 @@
 * 修改namespace
 ```shell
 NAMESPACE="default"
-sed -i'' "s/namespace:.*/namespace: $NAMESPACE/g" ./rbac.yaml ./deployment.yaml
+sed -i'' "s/namespace:.*/namespace: $NAMESPACE/g" ./deploy/rbac.yaml ./deploy/deployment.yaml
 ```
 
 * 修改 `deployment.yaml`

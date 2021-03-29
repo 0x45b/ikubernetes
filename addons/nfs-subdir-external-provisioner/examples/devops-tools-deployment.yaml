@@ -1,0 +1,29 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: devops-tools
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: devops-tools
+  template:
+    metadata:
+      labels:
+        app: devops-tools
+    spec:
+      containers:
+      - args:
+        - infinity
+        command:
+        - /bin/sleep
+        image: zhh1115/devops-tools:latest
+        imagePullPolicy: Always
+        name: devops-tools
+        volumeMounts:
+          - name: nfs-pvc-data
+            mountPath: /data
+      volumes:
+        - name: nfs-pvc-data
+          persistentVolumeClaim:
+            claimName: devops-tools-pvc
