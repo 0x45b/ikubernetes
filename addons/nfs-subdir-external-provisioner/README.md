@@ -19,16 +19,16 @@
 
 # nfs provisoner参数
 
-    ```text
-    1. onDelete
-    支持两个值：delete和retain。
-    delete：如果目录已经存在，删除这个目录。
-    retain：如果目录已经存储，保留这个目录。
+```text
+1. onDelete
+支持两个值：delete和retain。
+delete：如果目录已经存在，删除这个目录。
+retain：如果目录已经存储，保留这个目录。
 
-    2. archiveOnDelete
-    如果是false，则删除的时候不会归档。如果定义了onDelete，则忽略该参数。
+2. archiveOnDelete
+如果是false，则删除的时候不会归档。如果定义了onDelete，则忽略该参数。
 
-    3. pathPattern
-    使用pvc的元数据创建目录。比如根据label、annotation、name或者namespace来创建。引用metadata：${.PVC.<metadata>}。
-    如 ${.PVC.name}，${.PVC.namespace}等。
-    ```
+3. pathPattern
+使用pvc的元数据创建目录。比如根据label、annotation、name或者namespace来创建。引用metadata：${.PVC.<metadata>}。
+如 ${.PVC.name}，${.PVC.namespace}等。
+```
