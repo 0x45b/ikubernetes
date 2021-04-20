@@ -5,4 +5,4 @@ metadata:
 provisioner: nfs-provisioner
 parameters:
   pathPattern: "${.PVC.namespace}/${.PVC.name}"
-  onDelete: delete
+  onDelete: retain
