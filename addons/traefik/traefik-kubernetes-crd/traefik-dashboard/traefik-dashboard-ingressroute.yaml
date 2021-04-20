@@ -1,23 +1,23 @@
-#apiVersion: traefik.containo.us/v1alpha1
-#kind: IngressRoute
-#metadata:
-# name: traefik-ingress-dashboard-http
-# namespace: traefik-ingress
-#spec:
-# entryPoints:
-#   - http
-# routes:
-#   - kind: Rule
-#     match: Host(`traefik-dashboard.fdisk.cc`)
-#     services:
-#     - name: traefik-ingress-dashboard
-#       kind: Service
-#       namespace: traefik-ingress
-#       port: 8080
-#     middlewares:
-#       - name: to-https
-#         namespace: traefik-ingress
-#
+apiVersion: traefik.containo.us/v1alpha1
+kind: IngressRoute
+metadata:
+  name: traefik-ingress-dashboard-http
+  namespace: traefik-ingress
+spec:
+  entryPoints:
+    - http
+  routes:
+    - kind: Rule
+      match: Host(`traefik-dashboard.fdisk.cc`)
+      services:
+      - name: traefik-ingress-dashboard
+        kind: Service
+        namespace: traefik-ingress
+        port: 8080
+      middlewares:
+        - name: to-https
+          namespace: traefik-ingress
+
 ---
 apiVersion: traefik.containo.us/v1alpha1
 kind: IngressRoute
@@ -36,5 +36,5 @@ spec:
         namespace: traefik-ingress
         port: 8080
   tls:
-    certResolver: alidns
-    secretName: traefik-dashboard-certs
+    # certResolver: alidns
+    secretName: wildcard-fdisk-cc
